@@ -24,7 +24,12 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: "Password is required"
     },
-    salt: String
+    salt: String,
+
+    educator: {
+        type: Boolean,
+        default: false
+    }
 })
 
 UserSchema
@@ -50,7 +55,7 @@ UserSchema.methods = {
                 .update(password)
                 .digest('hex')
         } catch (err) {
-            console.log(err.message)            
+            console.log(err.message)
             return ''
         }
     },
