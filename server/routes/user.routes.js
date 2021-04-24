@@ -14,6 +14,8 @@ router.route('/api/users/:userId')
     .delete(authCtrl.requireSignin, authCtrl.hasAuthorization,
         userCtrl.remove)
 
+
+
 router.param('userId', userCtrl.userByID)
 
 export default router
