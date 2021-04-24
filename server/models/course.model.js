@@ -1,5 +1,13 @@
 import mongoose from 'mongoose'
 
+const LessonSchema = new mongoose.Schema({
+    title: String,
+    content: String,
+    resource_url: String
+})
+const Lesson = mongoose.model('Lesson', LessonSchema)
+
+
 const CourseSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -31,6 +39,7 @@ const CourseSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    lessons: [LessonSchema]
 })
 
 export default mongoose.model('Course', CourseSchema)

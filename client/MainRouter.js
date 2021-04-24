@@ -26,9 +26,10 @@ const MainRouter = () => {
             <Route path="/user/:userId" component={Profile}/>
             <Route path="/course/:courseId" component={Course}/>
             
+            <PrivateRoute path="/teach/course/new" component={NewCourse}/>
             <PrivateRoute path="/teach/courses" component={MyCourses}/>
             <PrivateRoute path="/teach/course/:courseId" component={Course}/>
-            <PrivateRoute path="/teach/course/new" component={NewCourse}/>
+            
 
         </Switch>
     </div>

@@ -1,8 +1,10 @@
-import { Card, CardHeader, CardMedia, IconButton, Link, makeStyles, Typography } from '@material-ui/core'
+import { Avatar, Card, CardHeader, CardMedia, Divider, IconButton, List, ListItem, ListItemAvatar, ListItemText, makeStyles, Typography } from '@material-ui/core'
 import { Edit } from '@material-ui/icons'
 import React, { useEffect, useState } from 'react'
 import auth from '../auth/auth-helper'
 import { read } from './api-course'
+import NewLesson from './NewLesson'
+import { Link, Redirect } from 'react-router-dom'
 
 
 const useStyles = makeStyles(theme => ({
@@ -29,7 +31,8 @@ const useStyles = makeStyles(theme => ({
     sub: {
         display: 'block',
         margin: '3px 0px 5px 0px',
-        fontSize: '0.9em'
+        fontSize: '0.9em',
+        
     },
     media: {
         height: 190,
@@ -102,16 +105,20 @@ export default function Course({ match }) {
         ? `/api/courses/photo/${course._id}?${new Date().getTime()}`
         : '/api/courses/defaultphoto'
 
+    const addLesson = (course) => {
+        setCourse(course)
+    }
+
     return (
         <div className={classes.root}>
             <Card className={classes.card}>
                 <CardHeader
                     title={course.name}
                     subheader={<div>
-                        <Link to={"/user/" + course.instructor._id}>
+                        <Link to={"/user/" + course.instructor._id} className={classes.sub} >
                             By {course.instructor.name}
                         </Link>
-                        <span>{course.category}</span>
+                        <span className={classes.category}>{course.category}</span>
                     </div>
                     }
                     action={auth.isAuthenticated().user && auth.isAuthenticated().user._id ==
@@ -124,13 +131,44 @@ export default function Course({ match }) {
                         </span>)
                     }
                 />
-                <CardMedia className={classes.media} image={imageUrl} title={course.name} />
-                <div>
-                    <Typography variant="body1">
-                        {course.description}
-                    </Typography>
+                <div className={classes.flex}>
+                    <CardMedia className={classes.media} image={imageUrl} title={course.name} />
+                    <div className={classes.details}>
+                        <Typography variant="body1" className={classes.subheading}>
+                            {course.description}<br />
+                        </Typography>
+                    </div>
                 </div>
-
+                <Divider />
+                <CardHeader
+                    title={<Typography variant="h6" className={classes.subheading}>Lessons</Typography>
+                    }
+                    subheader={<Typography variant="body1" className={classes.subheading}>{course.lessons && course.lessons.length} lessons</Typography>}
+                    action={
+                        auth.isAuthenticated().user && auth.isAuthenticated().user._id == course.instructor._id && !course.published &&
+                        (<span className={classes.action}>
+                            <NewLesson courseId={course._id} addLesson={addLesson} />
+                        </span>)
+                    }
+                />
+                <List>
+                    {course.lessons && course.lessons.map((lesson, index) => {
+                        return (<span key={index}>
+                            <ListItem>
+                                <ListItemAvatar>
+                                    <Avatar>
+                                        {index + 1}
+                                    </Avatar>
+                                </ListItemAvatar>
+                                <ListItemText
+                                    primary={lesson.title}
+                                />
+                            </ListItem>
+                            <Divider variant="inset" component="li" />
+                        </span>)
+                    }
+                    )}
+                </List>
             </Card>
         </div>
     )
