@@ -1,11 +1,11 @@
-import { Avatar, Card, CardHeader, CardMedia, Divider, IconButton, List, ListItem, ListItemAvatar, ListItemText, makeStyles, Typography } from '@material-ui/core'
+import { Avatar, Button, Card, CardHeader, CardMedia, Divider, IconButton, List, ListItem, ListItemAvatar, ListItemText, makeStyles, Typography } from '@material-ui/core'
 import { Edit } from '@material-ui/icons'
 import React, { useEffect, useState } from 'react'
 import auth from '../auth/auth-helper'
 import { read } from './api-course'
 import NewLesson from './NewLesson'
 import { Link, Redirect } from 'react-router-dom'
-
+import DeleteCourse from './DeleteCourse'
 
 const useStyles = makeStyles(theme => ({
     root: theme.mixins.gutters({
@@ -32,7 +32,7 @@ const useStyles = makeStyles(theme => ({
         display: 'block',
         margin: '3px 0px 5px 0px',
         fontSize: '0.9em',
-        
+
     },
     media: {
         height: 190,
@@ -109,6 +109,10 @@ export default function Course({ match }) {
         setCourse(course)
     }
 
+    const removeCourse = (course) => {
+        setValues({ ...values, redirect: true })
+    }
+
     return (
         <div className={classes.root}>
             <Card className={classes.card}>
@@ -128,6 +132,12 @@ export default function Course({ match }) {
                                 <Edit />
                             </IconButton>
                         </Link>
+                            {!course.published ? (<>
+                                
+                                <DeleteCourse course={course} onRemove={removeCourse} />
+                            </>) : (
+                                    <Button color="primary" variant="outlined">Published</Button>
+                                )}
                         </span>)
                     }
                 />
