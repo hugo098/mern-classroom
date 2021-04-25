@@ -66,4 +66,20 @@ const newLesson = async (params, credentials, lesson) => {
     }
 }
 
-export { create, listByInstructor, read, newLesson }
+const update = async (params, credentials, course) => {
+    try {
+        let response = await fetch('/api/courses/' + params.courseId, {
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': 'Bearer ' + credentials.t
+            },
+            body: course
+        })
+        return await response.json()
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+export { create, listByInstructor, read, newLesson, update }
