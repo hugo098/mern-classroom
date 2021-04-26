@@ -6,6 +6,10 @@ import { read, update } from './api-course'
 import NewLesson from './NewLesson'
 import { Link, Redirect } from 'react-router-dom'
 import DeleteCourse from './DeleteCourse'
+import Enroll from './../enrollment/Enroll'
+import { enrollmentStats } from '../enrollment/api-enrollment'
+import PeopleIcon from '@material-ui/icons/Group'
+import CompletedIcon from '@material-ui/icons/VerifiedUser'
 
 const useStyles = makeStyles(theme => ({
     root: theme.mixins.gutters({
@@ -97,6 +101,22 @@ export default function Course({ match }) {
         }
     }, [match.params.courseId])
 
+    useEffect(() => {
+        const abortController = new AbortController()
+        const signal = abortController.signal
+
+        enrollmentStats({ courseId: match.params.courseId }, { t: jwt.token }, signal).then((data) => {
+            if (data.error) {
+                setValues({ ...values, error: data.error })
+            } else {
+                setStats(data)
+            }
+        })
+        return function cleanup() {
+            abortController.abort()
+        }
+    }, [match.params.courseId])
+
     if (values.redirect) {
         return (<Redirect to={'/teach/courses'} />)
     }
@@ -152,25 +172,33 @@ export default function Course({ match }) {
                         <span className={classes.category}>{course.category}</span>
                     </div>
                     }
-                    action={auth.isAuthenticated().user && auth.isAuthenticated().user._id ==
-                        course.instructor._id &&
-                        (<span><Link to={"/teach/course/edit/" + course._id}>
-                            <IconButton aria-label="Edit" color="secondary">
-                                <Edit />
-                            </IconButton>
-                        </Link>
-                            {!course.published ? (<>
-                                <Button color="secondary" variant="outlined"
-                                    onClick={clickPublish}>
-                                    {course.lessons.length == 0 ?
-                                        "Add atleast 1 lesson to publish"
-                                        : "Publish"}
-                                </Button>
-                                <DeleteCourse course={course} onRemove={removeCourse} />
-                            </>) : (
-                                    <Button color="primary" variant="outlined">Published</Button>
-                                )}
-                        </span>)
+                    action={<>
+                        {auth.isAuthenticated().user && auth.isAuthenticated().user._id ==
+                            course.instructor._id &&
+                            (<span><Link to={"/teach/course/edit/" + course._id}>
+                                <IconButton aria-label="Edit" color="secondary">
+                                    <Edit />
+                                </IconButton>
+                            </Link>
+                                {!course.published ? (<>
+                                    <Button color="secondary" variant="outlined"
+                                        onClick={clickPublish}>
+                                        {course.lessons.length == 0 ?
+                                            "Add atleast 1 lesson to publish"
+                                            : "Publish"}
+                                    </Button>
+                                    <DeleteCourse course={course} onRemove={removeCourse} />
+                                </>) : (
+                                        <Button color="primary" variant="outlined">Published</Button>
+                                    )}
+                            </span>)}
+
+                        {course.published && (<div>
+                            <span className={classes.statSpan}><PeopleIcon /> {stats.totalEnrolled} enrolled </span>
+                            <span className={classes.statSpan}><CompletedIcon /> {stats.totalCompleted} completed </span>
+                        </div>
+                        )}
+                    </>
                     }
                 />
                 <div className={classes.flex}>
@@ -179,8 +207,14 @@ export default function Course({ match }) {
                         <Typography variant="body1" className={classes.subheading}>
                             {course.description}<br />
                         </Typography>
+
+                        {course.published && auth.isAuthenticated() ? <div className={classes.enroll}><Enroll courseId={course._id} /></div> : <div className={classes.enroll}><Link to="/signin">Sign in to Enroll</Link></div>}
+
                     </div>
                 </div>
+
+
+
                 <Divider />
                 <CardHeader
                     title={<Typography variant="h6" className={classes.subheading}>Lessons</Typography>

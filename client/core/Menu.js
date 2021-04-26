@@ -22,7 +22,7 @@ const isPartActive = (history, path) => {
     return { color: '#616161', backgroundColor: '#fffde7', border: '1px solid #f57c00', marginRight: 10 }
 }
 const Menu = withRouter(({ history }) => (
-  <AppBar position="static">
+  <AppBar position="fixed" style={{zIndex:12343455}}>
     <Toolbar>
       <Typography variant="h6" color="inherit">
         MERN Classroom

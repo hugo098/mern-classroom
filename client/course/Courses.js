@@ -6,6 +6,7 @@ import GridListTile from '@material-ui/core/GridListTile'
 import GridListTileBar from '@material-ui/core/GridListTileBar'
 import { Link } from 'react-router-dom'
 import auth from './../auth/auth-helper'
+import Enroll from './../enrollment/Enroll'
 
 const useStyles = makeStyles(theme => ({
     title: {
@@ -60,7 +61,7 @@ export default function Courses(props) {
                             subtitle={<span>{course.category}</span>}
                             actionIcon={
                                 <div className={classes.action}>
-                                   
+                                    {auth.isAuthenticated() ? <Enroll courseId={course._id} /> : <Link to="/signin">Sign in to Enroll</Link>}
                                 </div>
                             }
                         />
